@@ -87,119 +87,73 @@
 
 !function ($) {
 
+
+
     $.fn.glauserChristmas = function (options) {
+
+
+
         var canvasElement = $(this);
-        var snowBalls = [
-            {
-                progress:0,
-                angle: 0.2,
-                start: 200,
-                size: 15,
-                speed: 2
-            },
-            {
-                progress:0,
-                angle: 0.3,
-                start: 150,
-                size: 13,
-                speed: 2
-            },
-            {
-                progress:0,
-                angle: 0.4,
-                start: 400,
-                size: 13,
-                speed: 2
-            },
-            {
-                progress:0,
-                angle: 0.1,
-                start: 500,
-                size: 13,
-                speed: 2
-            },
-            {
-                progress:0,
-                angle: 0.3,
-                start: 700,
-                size: 13,
-                speed: 2
-            },
-            {
-                progress:0,
-                angle: 0.4,
-                start: 400,
-                size: 13,
-                speed: 2
-            },
-            {
-                progress:0,
-                angle: 0.1,
-                start: 250,
-                size: 13,
-                speed: 2
-            }
-        ]
-
-
-
-//        // Click the star to make it spin
-//        canvasElement.drawPolygon({
-//            layer: true,
-//            fillStyle: "#c33",
-//            x: 100, y: 100,
-//            radius: 50,
-//            sides: 5,
-//            concavity: 0.5,
-//            click: function(layer) {
-//                // Spin star
-//                $(this).animateLayer(layer, {
-//                    rotate: '+=144'
-//                });
-//            }
-//        });
-        updateDimension = function (){
-            canvasElement.attr('width', document.body.clientWidth-20);
-            canvasElement.attr('height', document.body.clientHeight);
-        }
-
-        updateDimension();
-        var mouseDownPosition = [];
-        var mouseUpPosition = [];
-        var mouseMoveVector = [];
-        var mouseMoveLength = 0;
-
         var settings = $.extend({
             minMove: 5
         }, options);
 
 
+        var snowBalls = [];
+
+        /**
+         * Update the canvas height and width when the browser is resized.
+         */
+        updateDimension = function (){
+            canvasElement.attr('width', document.body.clientWidth);
+            canvasElement.attr('height', document.body.clientHeight);
+        }
+        updateDimension();
+        jQuery(window).resize(function(){
+            updateDimension();
+        });
+
+
+        var mouseDownPosition = [];
+        var mouseUpPosition = [];
+        var mouseMoveVector = [];
+        var mouseMoveLength = 0;
+
+
+
         $('html').mousemove(function (e) {
             mouseUpPosition.x = e.pageX;
             mouseUpPosition.y = e.pageY;
-            mouseUpPosition.timeStamp = e.timeStamp;
             mouseMoveVector.x = mouseUpPosition.x - mouseDownPosition.x;
             mouseMoveVector.y = mouseUpPosition.y - mouseDownPosition.y;
-            mouseMoveVector.timeStamp = mouseUpPosition.timeStamp - mouseDownPosition.timeStamp;
+
             mouseMoveLength = Math.floor(Math.sqrt(Math.pow(mouseMoveVector.x, 2) + Math.pow(mouseMoveVector.y, 2)));
 
-                addSnowFlake(0,Math.random()*2-1,Math.random()*2000,Math.random()*15+5,2);
-                mouseDownPosition.x = e.pageX;
-                mouseDownPosition.y = e.pageY;
-
-                console.log(mouseMoveVector);
-                console.log(mouseMoveLength);
-                console.log(e);
-
-
-//            console.log(mouseMoveVector.timeStamp);
+            addSnowFlake(0,Math.random()*2-1,Math.random()*document.body.clientWidth,Math.random()*10+10,Math.random()+2);
+             mouseDownPosition.x = e.pageX;
+             mouseDownPosition.y = e.pageY;
+            console.log(mouseMoveVector);
+            console.log(mouseMoveLength);
+            console.log(e);
             mouseDownPosition.timeStamp = e.timeStamp;
 
         });
 
         var height = -50;
-        var SnowFlakes = setInterval(function(){
+
+        var requestAnimationFrame = window.requestAnimationFrame ||
+            window.webkitRequestAnimationFrame ||
+            window.mozRequestAnimationFrame ||
+            function(func){ setTimeout(func, 1000 / 60); };
+
+        var SnowFlakes = function(){
             canvasElement.clearCanvas();
+            drawSnowFlakes();
+            requestAnimationFrame(SnowFlakes);
+        };
+        requestAnimationFrame(SnowFlakes);
+
+        var drawSnowFlakes = function(){
             var lenght = snowBalls.length;
             for (var i = 0; i < lenght; i++) {
                 if (snowBalls[i] == null){
@@ -210,20 +164,18 @@
                     strokeWidth: 4,
                     x: getXCoordinate(snowBalls[i].progress,snowBalls[i].angle,snowBalls[i].start), y: snowBalls[i].progress,
                     width: snowBalls[i].size, height: snowBalls[i].size,
-                    opacity: 0.5
+                    opacity: 0.7
                 });
 
-                if (parseInt(snowBalls[i].progress) > parseInt(canvasElement.attr("height"))){
-                    snowBalls[i] = null;
+                if (parseInt(snowBalls[i].progress) > parseInt(canvasElement.attr("height"))+50){
+                    snowBalls.splice(i,1);
+//                    snowBalls[i] = null;
                 }
                 else {
                     snowBalls[i].progress = snowBalls[i].progress + snowBalls[i].speed;
                 }
             }
-
-
-
-        }, 32);
+        };
 
         var addSnowFlake = function (progress, angle, start, size, speed) {
             snowBalls.push({
@@ -239,9 +191,7 @@
               return progress*angle+start;
         };
 
-        jQuery(window).resize(function(){
-            updateDimension();
-        });
+
     };
 
 }(jQuery);

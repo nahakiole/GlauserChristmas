@@ -1,3 +1,7 @@
 jQuery(document).ready(function(){
-    jQuery('#snowland').glauserChristmas();
+    jQuery('#snowland').glauserChristmas({
+
+    });
+
+
 });
