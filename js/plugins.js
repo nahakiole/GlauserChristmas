@@ -95,11 +95,16 @@
 
         var canvasElement = $(this);
         var settings = $.extend({
-            minMove: 5
+            pathReduction: 1,
+            maxSnowflakes: 500
         }, options);
+
+        settings.pathReduction = parseInt(settings.pathReduction);
 
 
         var snowBalls = [];
+        var pathLength = 0;
+        var newSnowFlakes = 0;
 
         /**
          * Update the canvas height and width when the browser is resized.
@@ -113,14 +118,13 @@
             updateDimension();
         });
 
-
         var mouseDownPosition = [];
         var mouseUpPosition = [];
         var mouseMoveVector = [];
         var mouseMoveLength = 0;
 
 
-
+        console.log(pathLength);
         $('html').mousemove(function (e) {
             mouseUpPosition.x = e.pageX;
             mouseUpPosition.y = e.pageY;
@@ -128,18 +132,13 @@
             mouseMoveVector.y = mouseUpPosition.y - mouseDownPosition.y;
 
             mouseMoveLength = Math.floor(Math.sqrt(Math.pow(mouseMoveVector.x, 2) + Math.pow(mouseMoveVector.y, 2)));
+            pathLength = parseInt(parseInt(pathLength)+parseInt(mouseMoveLength)) || 0;
 
-            addSnowFlake(0,Math.random()*2-1,Math.random()*document.body.clientWidth,Math.random()*10+10,Math.random()+2);
-             mouseDownPosition.x = e.pageX;
-             mouseDownPosition.y = e.pageY;
-            console.log(mouseMoveVector);
-            console.log(mouseMoveLength);
-            console.log(e);
-            mouseDownPosition.timeStamp = e.timeStamp;
+            mouseDownPosition.x = e.pageX;
+            mouseDownPosition.y = e.pageY;
 
         });
 
-        var height = -50;
 
         var requestAnimationFrame = window.requestAnimationFrame ||
             window.webkitRequestAnimationFrame ||
@@ -149,6 +148,7 @@
         var SnowFlakes = function(){
             canvasElement.clearCanvas();
             drawSnowFlakes();
+            drawDebug();
             requestAnimationFrame(SnowFlakes);
         };
         requestAnimationFrame(SnowFlakes);
@@ -162,19 +162,36 @@
                 canvasElement.drawEllipse({
                     fillStyle: "#fff",
                     strokeWidth: 4,
-                    x: getXCoordinate(snowBalls[i].progress,snowBalls[i].angle,snowBalls[i].start), y: snowBalls[i].progress,
+                    x: getXCoordinate(snowBalls[i].progress,snowBalls[i].angle,snowBalls[i].start),
+                    y: snowBalls[i].progress,
                     width: snowBalls[i].size, height: snowBalls[i].size,
                     opacity: 0.7
                 });
 
                 if (parseInt(snowBalls[i].progress) > parseInt(canvasElement.attr("height"))+50){
                     snowBalls.splice(i,1);
-//                    snowBalls[i] = null;
                 }
                 else {
                     snowBalls[i].progress = snowBalls[i].progress + snowBalls[i].speed;
                 }
             }
+        };
+
+        var drawDebug = function(){
+            canvasElement.drawText({
+                y: 30,
+                x: 200,
+                fontSize: 48,
+                text: "Mouse: "+pathLength,
+                fillStyle: "#fff"
+            });
+            canvasElement.drawText({
+                y: 100,
+                x: 200,
+                fontSize: 48,
+                text: "Schneefloken "+newSnowFlakes,
+                fillStyle: "#fff"
+            });
         };
 
         var addSnowFlake = function (progress, angle, start, size, speed) {
@@ -190,6 +207,21 @@
         var getXCoordinate = function(progress,angle,start){
               return progress*angle+start;
         };
+
+        setInterval(function(){
+            newSnowFlakes = parseInt(pathLength/settings.maxSnowflakes) || 0;
+
+            for (var i = 0; i < newSnowFlakes; i++){
+                addSnowFlake(0-Math.random()*200,Math.random()*2-1,Math.random()*document.body.clientWidth,Math.random()*10+10,Math.random()+2);
+            }
+        }, 100);
+
+         setInterval(function(){
+            pathLength = pathLength-settings.pathReduction;
+            pathLength = pathLength < 50 ? 50 : pathLength;
+        }, 10);
+
+
 
 
     };

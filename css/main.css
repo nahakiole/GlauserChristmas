@@ -21,6 +21,7 @@ textarea {
 html {
     font-size: 1em;
     line-height: 1.4;
+    overflow-y: scroll;
 }
 
 /*
@@ -102,6 +103,7 @@ body, html {
     width: 100%;
     background: #648cc3;
 }
+
 
 
 
