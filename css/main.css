@@ -113,6 +113,10 @@ body, html {
 }
 
 
+.typekit-badge {
+    display: none !important;
+}
+
 
 
 

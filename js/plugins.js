@@ -105,14 +105,16 @@
         var snowBalls = [];
         var pathLength = 0;
         var newSnowFlakes = 0;
+        var totalProcess = 0;
 
         /**
          * Update the canvas height and width when the browser is resized.
          */
-        updateDimension = function (){
+        var updateDimension = function (){
             canvasElement.attr('width', document.body.clientWidth);
             canvasElement.attr('height', document.body.clientHeight);
-        }
+        };
+
         updateDimension();
         jQuery(window).resize(function(){
             updateDimension();
@@ -126,6 +128,7 @@
 
         console.log(pathLength);
         $('html').mousemove(function (e) {
+
             mouseUpPosition.x = e.pageX;
             mouseUpPosition.y = e.pageY;
             mouseMoveVector.x = mouseUpPosition.x - mouseDownPosition.x;
@@ -147,13 +150,16 @@
 
         var SnowFlakes = function(){
             canvasElement.clearCanvas();
+            drawWorld();
             drawSnowFlakes();
             drawDebug();
             requestAnimationFrame(SnowFlakes);
         };
         requestAnimationFrame(SnowFlakes);
 
+        var xCalc;
         var drawSnowFlakes = function(){
+
             var lenght = snowBalls.length;
             for (var i = 0; i < lenght; i++) {
                 if (snowBalls[i] == null){
@@ -186,23 +192,111 @@
                     snowBalls[i].progress = snowBalls[i].progress + snowBalls[i].speed;
                 }
             }
+
+            if (opacity != 0.05 && opacity > 0.05 && snowGeneration){
+                opacity = opacity-5;
+                console.log(opacity);
+            }
         };
 
         var drawDebug = function(){
             canvasElement.drawText({
                 y: 30,
-                x: 200,
-                fontSize: 48,
+                x: 20,
+                fontSize: 20,
                 text: "Mouse: "+pathLength,
-                fillStyle: "#fff"
+                fillStyle: "#fff",
+                respectAlign: true,
+                align: "left"
             });
             canvasElement.drawText({
-                y: 100,
-                x: 200,
-                fontSize: 48,
-                text: "Schneefloken "+newSnowFlakes,
-                fillStyle: "#fff"
+                y: 60,
+                x: 20,
+                fontSize: 20,
+                text: "Schneefloken: "+newSnowFlakes,
+                fillStyle: "#fff",
+                respectAlign: true,
+                align: "left"
             });
+            canvasElement.drawText({
+                y: 90,
+                x: 20,
+                fontSize: 20,
+                text: "Rotate: "+rotate,
+                fillStyle: "#fff",
+                respectAlign: true,
+                align: "left"
+            });
+        };
+
+        var rotate = 0;
+        var opacity = 100;
+        var family = [
+            'Andrea',
+            'Robin',
+            'Oliver',
+            'Silvia',
+            'Rolf',
+            'Nicolas'
+        ]
+        var drawWorld = function(){
+
+
+
+            canvasElement.drawEllipse({
+                fillStyle: "#000",
+                x: document.body.clientWidth/2, y: 500,
+                width: 300, height: 300
+            });
+
+            canvasElement.drawText({
+                x: document.body.clientWidth/2, y: 500,
+                fontSize: 80,
+                text: "shake\nthe\ncloud",
+                fillStyle: "#e5ce7e",
+                fontFamily: "hilde-sharp",
+                lineHeight: "0.75",
+                opacity:opacity/100
+            });
+
+            var l = family.length;
+            for (var i = 0; i < l; i++){
+                canvasElement.drawText({
+                    x: document.body.clientWidth/2, y: 500,
+                    fontSize: 80,
+                    text: family[i].substr(0,1)+"\n\n\n\n\n\n",
+                    fillStyle: "#000",
+                    fontFamily: "Arial",
+                    lineHeight: "0.75",
+                    rotate: rotate+i*(360/l)
+                });
+
+
+                $("canvas").drawImage({
+                    source: "img/"+family[i]+".png",
+                    x: document.body.clientWidth/2, y: 500,
+                    rotate: rotate+i*(360/l)
+                });
+            }
+
+            canvasElement.drawBezier({
+                strokeStyle: "#e5ce7e",
+                strokeWidth: 6,
+                rounded: true,
+                startArrow: true,
+                endArrow: false,
+                arrowRadius: 15,
+                arrowAngle: 90,
+                x1: document.body.clientWidth/2-200, y1: 190,
+                cx1:  document.body.clientWidth/2-200, cy1: 200,
+                cx2: document.body.clientWidth/2-200, cy2: 300,
+                x2: document.body.clientWidth/2-100, y2: 400,
+                opacity: opacity/100
+            });
+
+            rotate = (rotate+1)%360;
+
+
         };
 
         var addSnowFlake = function (progress, angle, start, size, speed) {
@@ -213,12 +307,13 @@
                 size: size,
                 speed: speed
             });
-        }
+        };
 
         var getXCoordinate = function(progress,angle,start){
               return progress*angle+start;
         };
 
+        var snowGeneration = false;
         setInterval(function(){
             newSnowFlakes = parseInt(pathLength/settings.reduceSnowflakes) || 0;
 
@@ -227,15 +322,27 @@
                 newSnowFlakes = settings.maxNewSnowFlakes;
             }
 
+//            jQuery(clickSound).stop().animate({volume: newSnowFlakes/5}, 600);
+            if (newSnowFlakes == 0){
+
+            }
+            else {
+                snowGeneration = true;
+//                clickSound.play();
+
+            }
+
+            var progressRand,angleRand,startRand,sizeRand,speedRand;
             for (var i = 0; i < newSnowFlakes; i++){
-                progressRand = 70-Math.random()*20;
+                progressRand = 100-Math.random()*20;
                 angleRand = Math.random()*2-1;
-                startRand = document.body.clientWidth/5*2 + (1/5)*Math.random()*document.body.clientWidth;
+                startRand = (Math.random()*(jQuery('#cloud').width()-150)) +  jQuery('#cloud').offset().left+60;
                 sizeRand = Math.random()*10+10;
                 speedRand = Math.random()+2;
 
                 addSnowFlake(progressRand, angleRand, startRand, sizeRand, speedRand);
             }
+
         }, 100);
 
          setInterval(function(){
