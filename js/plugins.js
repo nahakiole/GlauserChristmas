@@ -250,6 +250,7 @@
                     color = "#000000";
                     break;
                 case totalProcess < 3500:
+                    snowGeneration = true;
                     fontSize = 100;
                     color = "#f56ced";
                     fontColor = "#761370";
@@ -376,7 +377,10 @@
             var progressRand,angleRand,startRand,sizeRand,speedRand;
             for (var i = 0; i < newSnowFlakes; i++){
                var progressRand = 100-Math.random()*20;
-                var  angleRand = Math.random()*2-1;
+                var  angleRand = Math.random()*1.5-0.75;
+                var positiveAngleRand = angleRand < 0 ? 1 : -1;
+                angleRand = positiveAngleRand*angleRand*angleRand;
+
                 var  startRand = (Math.random()*(jQuery('#cloud').width()-150)) +  jQuery('#cloud').offset().left+60;
                 var  sizeRand = Math.random()*10+10;
                 var  speedRand = Math.random()+2;
