@@ -1,7 +1,8 @@
 jQuery(document).ready(function(){
     jQuery('#snowland').glauserChristmas({
-        pathReduction: 300,
-        maxSnowflakes: 50
+        pathReduction: 100,
+        reduceSnowflakes: 50,
+        maxNewSnowFlakes: 5
     });
 
 

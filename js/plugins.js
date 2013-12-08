@@ -96,7 +96,7 @@
         var canvasElement = $(this);
         var settings = $.extend({
             pathReduction: 1,
-            maxSnowflakes: 500
+            reduceSnowflakes: 500
         }, options);
 
         settings.pathReduction = parseInt(settings.pathReduction);
@@ -159,16 +159,27 @@
                 if (snowBalls[i] == null){
                     continue;
                 }
+
+                xCalc = getXCoordinate(snowBalls[i].progress,snowBalls[i].angle,snowBalls[i].start);
+
                 canvasElement.drawEllipse({
                     fillStyle: "#fff",
                     strokeWidth: 4,
-                    x: getXCoordinate(snowBalls[i].progress,snowBalls[i].angle,snowBalls[i].start),
+                    x: xCalc,
                     y: snowBalls[i].progress,
                     width: snowBalls[i].size, height: snowBalls[i].size,
                     opacity: 0.7
                 });
 
                 if (parseInt(snowBalls[i].progress) > parseInt(canvasElement.attr("height"))+50){
+                    snowBalls.splice(i,1);
+                }
+                else if(xCalc < -20)
+                {
+                    snowBalls.splice(i,1);
+                }
+                else if(xCalc > canvasElement.attr("width")+20)
+                {
                     snowBalls.splice(i,1);
                 }
                 else {
@@ -209,16 +220,27 @@
         };
 
         setInterval(function(){
-            newSnowFlakes = parseInt(pathLength/settings.maxSnowflakes) || 0;
+            newSnowFlakes = parseInt(pathLength/settings.reduceSnowflakes) || 0;
+
+            if(newSnowFlakes > settings.maxNewSnowFlakes)
+            {
+                newSnowFlakes = settings.maxNewSnowFlakes;
+            }
 
             for (var i = 0; i < newSnowFlakes; i++){
-                addSnowFlake(0-Math.random()*200,Math.random()*2-1,Math.random()*document.body.clientWidth,Math.random()*10+10,Math.random()+2);
+                progressRand = 0-Math.random()*200;
+                angleRand = Math.random()*2-1;
+                startRand = document.body.clientWidth/3 + (1/3)*Math.random()*document.body.clientWidth;
+                sizeRand = Math.random()*10+10;
+                speedRand = Math.random()+2;
+
+                addSnowFlake(progressRand, angleRand, startRand, sizeRand, speedRand);
             }
         }, 100);
 
          setInterval(function(){
             pathLength = pathLength-settings.pathReduction;
-            pathLength = pathLength < 50 ? 50 : pathLength;
+            pathLength = pathLength < 0 ? 0 : pathLength;
         }, 10);
 
 
