@@ -228,11 +228,11 @@
             }
 
             for (var i = 0; i < newSnowFlakes; i++){
-                progressRand = 70-Math.random()*20;
-                angleRand = Math.random()*2-1;
-                startRand = document.body.clientWidth/5*2 + (1/5)*Math.random()*document.body.clientWidth;
-                sizeRand = Math.random()*10+10;
-                speedRand = Math.random()+2;
+                var progressRand = 70-Math.random()*20;
+                var angleRand = Math.random()*3.14/2-3.14/4;
+                var startRand = document.body.clientWidth/5*2 + (1/5)*Math.random()*document.body.clientWidth;
+                var sizeRand = Math.random()*10+10;
+                var speedRand = Math.random()+2;
 
                 addSnowFlake(progressRand, angleRand, startRand, sizeRand, speedRand);
             }
