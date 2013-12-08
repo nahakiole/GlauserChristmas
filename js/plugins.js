@@ -228,9 +228,9 @@
             }
 
             for (var i = 0; i < newSnowFlakes; i++){
-                progressRand = 0-Math.random()*200;
+                progressRand = 70-Math.random()*20;
                 angleRand = Math.random()*2-1;
-                startRand = document.body.clientWidth/3 + (1/3)*Math.random()*document.body.clientWidth;
+                startRand = document.body.clientWidth/5*2 + (1/5)*Math.random()*document.body.clientWidth;
                 sizeRand = Math.random()*10+10;
                 speedRand = Math.random()+2;
 
@@ -241,6 +241,7 @@
          setInterval(function(){
             pathLength = pathLength-settings.pathReduction;
             pathLength = pathLength < 0 ? 0 : pathLength;
+            pathLength = pathLength > 25000 ? 25000 : pathLength;
         }, 10);
 
 

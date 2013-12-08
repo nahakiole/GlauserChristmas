@@ -102,8 +102,15 @@ body, html {
     height: 100%;
     width: 100%;
     background: #091e3d;
+
 }
 
+#cloud {
+    position: absolute;
+    left: 50%;
+    top: 10px;
+    margin-left: -250px;
+}
 
 
 
