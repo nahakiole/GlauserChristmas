@@ -316,7 +316,7 @@
 
                 $("canvas").drawImage({
                     source: "img/"+family[i]+".png",
-                    x: document.body.clientWidth/2, y: 6006666666,
+                    x: document.body.clientWidth/2, y: 600,
                     rotate: rotate+i*(360/l)
                 });
             }
@@ -332,7 +332,7 @@
                 x1: document.body.clientWidth/2-200, y1: 190,
                 cx1:  document.body.clientWidth/2-200, cy1: 200,
                 cx2: document.body.clientWidth/2-200, cy2: 300,
-                x2: document.body.clientWidth/2-100, y2: 400,
+                x2: document.body.clientWidth/2-100, y2: 500,
                 opacity: opacity/100
             });
 
