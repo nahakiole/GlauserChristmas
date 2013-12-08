@@ -239,42 +239,84 @@
             'Rolf',
             'Nicolas'
         ]
+        var color = "#000000";
+        var text = "shake\nthe\ncloud";
+        var fontSize = 80;
+        var fontColor = "#e7d283";
         var drawWorld = function(){
 
+            switch (true) {
+                case totalProcess < 2000:
+                    color = "#000000";
+                    break;
+                case totalProcess < 3500:
+                    fontSize = 100;
+                    color = "#f56ced";
+                    fontColor = "#761370";
+                    text = "we\nwish\nyou";
+                    break;
+                case totalProcess < 5500:
+                    fontSize = 90;
+                    fontColor = "#395b05";
+                    color = "#89d223";
+                    text = "a merry\nchrist-\nmas";
+                    break;
+                case totalProcess < 6500:
+                    fontSize = 100;
+                    color = "#181b20";
+                    fontColor = "#e5cd83";
+                    text = "and";
+                    break;
+                case totalProcess < 8500:
+                    fontSize = 80;
+                    fontColor = "#05586a";
+                    color = "#31caea";
+                    text = "a happy\nnew year";
+                    break;
+                case totalProcess < 10500:
+                    fontSize = 80;
+                    fontColor = "#e8d287";
+                    color = "#171a1f";
+                    text = "the\nglauser\n family";
+                    break;
+                case totalProcess < 12500:
+                    totalProcess = 2000;
+                    break;
+            }
 
 
             canvasElement.drawEllipse({
-                fillStyle: "#000",
-                x: document.body.clientWidth/2, y: 500,
+                fillStyle: color,
+                x: document.body.clientWidth/2, y: 600,
                 width: 300, height: 300
             });
 
             canvasElement.drawText({
-                x: document.body.clientWidth/2, y: 500,
-                fontSize: 80,
-                text: "shake\nthe\ncloud",
-                fillStyle: "#e5ce7e",
+                x: document.body.clientWidth/2, y: 600,
+                fontSize: fontSize,
+                text: text,
+                fillStyle: fontColor,
                 fontFamily: "hilde-sharp",
                 lineHeight: "0.75",
-                opacity:opacity/100
+                opacity: 1
             });
 
             var l = family.length;
             for (var i = 0; i < l; i++){
                 canvasElement.drawText({
-                    x: document.body.clientWidth/2, y: 500,
+                    x: document.body.clientWidth/2, y: 600,
                     fontSize: 80,
                     text: family[i].substr(0,1)+"\n\n\n\n\n\n",
-                    fillStyle: "#000",
+                    fillStyle: color,
+                    fontStyle: "bold",
                     fontFamily: "Arial",
-                    lineHeight: "0.75",
+                    lineHeight: "0.73",
                     rotate: rotate+i*(360/l)
                 });
 
-
                 $("canvas").drawImage({
                     source: "img/"+family[i]+".png",
-                    x: document.body.clientWidth/2, y: 500,
+                    x: document.body.clientWidth/2, y: 6006666666,
                     rotate: rotate+i*(360/l)
                 });
             }
@@ -294,8 +336,7 @@
                 opacity: opacity/100
             });
 
-            rotate = (rotate+1)%360;
-
+            rotate = (rotate+1+newSnowFlakes/10)%360;
 
         };
 
@@ -322,13 +363,13 @@
                 newSnowFlakes = settings.maxNewSnowFlakes;
             }
 
-//            jQuery(clickSound).stop().animate({volume: newSnowFlakes/5}, 600);
+            jQuery(clickSound).stop().animate({volume: newSnowFlakes/5}, 600);
             if (newSnowFlakes == 0){
 
             }
             else {
                 snowGeneration = true;
-//                clickSound.play();
+                clickSound.play();
 
             }
 
@@ -349,7 +390,10 @@
             pathLength = pathLength-settings.pathReduction;
             pathLength = pathLength < 0 ? 0 : pathLength;
             pathLength = pathLength > 25000 ? 25000 : pathLength;
+            totalProcess += 10;
         }, 10);
+
+
 
 
 
