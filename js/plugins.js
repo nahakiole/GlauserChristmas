@@ -251,13 +251,13 @@
                     break;
                 case totalProcess < 3500:
                     snowGeneration = true;
-                    fontSize = 100;
+                    fontSize = 90;
                     color = "#f56ced";
                     fontColor = "#761370";
                     text = "we\nwish\nyou";
                     break;
                 case totalProcess < 5500:
-                    fontSize = 90;
+                    fontSize = 70;
                     fontColor = "#395b05";
                     color = "#89d223";
                     text = "a merry\nchrist-\nmas";
@@ -269,7 +269,7 @@
                     text = "and";
                     break;
                 case totalProcess < 8500:
-                    fontSize = 80;
+                    fontSize = 70;
                     fontColor = "#05586a";
                     color = "#31caea";
                     text = "a happy\nnew year";
@@ -297,7 +297,7 @@
                 fontSize: fontSize,
                 text: text,
                 fillStyle: fontColor,
-                fontFamily: "hilde-sharp",
+                fontFamily: "Cambria",
                 lineHeight: "0.75",
                 opacity: 1
             });
@@ -337,7 +337,7 @@
                 opacity: opacity/100
             });
 
-            rotate = (rotate+1+newSnowFlakes/10)%360;
+            rotate = (rotate+1)%360;
 
         };
 
