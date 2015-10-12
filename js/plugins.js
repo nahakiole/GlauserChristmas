@@ -91,12 +91,54 @@
 
     $.fn.glauserChristmas = function (options) {
 
+        var family = [
+            'Robin',
+            'Andrea',
+            'Nicolas',
+            'Oliver',
+            'Silvia',
+            'Rolf'
+
+        ];
+
+        var l = family.length;
+        var images = new Array();
+
+        for (var i = 0; i < l; i++){
+            images[i] = new Image();
+            images[i].src = 'img/'+family[i]+'.png';
+        }
+
+
+
+
+        var featureDetection = function(){
+            var works = true;
+            if (!Modernizr.canvas){
+                works = false;
+            }
+            works = Modernizr.audio;
+            return works;
+        }
+
+        if (!featureDetection()){
+            jQuery('.not-supported').show();
+            jQuery('.html5').hide();
+
+        }
+
+        var clickSound = new Audio('../music/merrychristmas.mp3');
+        clickSound.loop = true;
+
+
 
 
         var canvasElement = $(this);
         var settings = $.extend({
             pathReduction: 1,
-            reduceSnowflakes: 500
+            reduceSnowflakes: 500,
+            maxNewSnowFlakes: 8,
+            maxSnowFlakes: 1000
         }, options);
 
         settings.pathReduction = parseInt(settings.pathReduction);
@@ -111,8 +153,8 @@
          * Update the canvas height and width when the browser is resized.
          */
         var updateDimension = function (){
-            canvasElement.attr('width', document.body.clientWidth);
-            canvasElement.attr('height', document.body.clientHeight);
+            canvasElement.attr('width', document.body.clientWidth*2);
+            canvasElement.attr('height', document.body.clientHeight*2);
         };
 
         updateDimension();
@@ -126,38 +168,54 @@
         var mouseMoveLength = 0;
 
 
-        console.log(pathLength);
-        $('html').mousemove(function (e) {
+        document.addEventListener('touchmove', function(e) {
+            movement(e.touches[0]);
+        }, false);
 
+
+        jQuery('html').mousemove(function (e) {
+            movement(e);
+        });
+
+
+        var movement = function(e){
             mouseUpPosition.x = e.pageX;
             mouseUpPosition.y = e.pageY;
             mouseMoveVector.x = mouseUpPosition.x - mouseDownPosition.x;
             mouseMoveVector.y = mouseUpPosition.y - mouseDownPosition.y;
-
             mouseMoveLength = Math.floor(Math.sqrt(Math.pow(mouseMoveVector.x, 2) + Math.pow(mouseMoveVector.y, 2)));
             pathLength = parseInt(parseInt(pathLength)+parseInt(mouseMoveLength)) || 0;
-
             mouseDownPosition.x = e.pageX;
             mouseDownPosition.y = e.pageY;
+        };
 
-        });
 
-
-        var requestAnimationFrame = window.requestAnimationFrame ||
+        var myRequestAnimationFrame =  window.requestAnimationFrame ||
             window.webkitRequestAnimationFrame ||
-            window.mozRequestAnimationFrame ||
-            function(func){ setTimeout(func, 1000 / 60); };
+            window.mozRequestAnimationFrame    ||
+            window.oRequestAnimationFrame      ||
+            window.msRequestAnimationFrame     ||
+            function(callback) {
+                window.setTimeout(callback, 10);
+            };
+        window.requestAnimationFrame=myRequestAnimationFrame;
 
+        var lastRender = Date.now();
+        var animationprocess;
         var SnowFlakes = function(){
+            var delta = Date.now() - lastRender;
+            lastRender = Date.now();
+            animationprocess = delta/16;
             canvasElement.clearCanvas();
             drawWorld();
             drawSnowFlakes();
-            drawDebug();
+            //drawDebug();
             requestAnimationFrame(SnowFlakes);
         };
         requestAnimationFrame(SnowFlakes);
 
         var xCalc;
+
         var drawSnowFlakes = function(){
 
             var lenght = snowBalls.length;
@@ -168,60 +226,60 @@
 
                 xCalc = getXCoordinate(snowBalls[i].progress,snowBalls[i].angle,snowBalls[i].start);
 
+                if (settings.maxSnowFlakes < lenght && i < 50 && snowBalls[i].opacity > 0.05){
+                    console.log(snowBalls[i].opacity);
+                    console.log(i);
+                    snowBalls[i].opacity = snowBalls[i].opacity-0.1;
+                }
+
                 canvasElement.drawEllipse({
                     fillStyle: "#fff",
                     strokeWidth: 4,
                     x: xCalc,
                     y: snowBalls[i].progress,
-                    width: snowBalls[i].size, height: snowBalls[i].size,
-                    opacity: 0.7
+                    width: snowBalls[i].size,
+                    height: snowBalls[i].size,
+                    opacity: snowBalls[i].opacity
                 });
 
-                if (parseInt(snowBalls[i].progress) > parseInt(canvasElement.attr("height"))+50){
-                    snowBalls.splice(i,1);
-                }
-                else if(xCalc < -20)
+                if(xCalc < -20 || xCalc > canvasElement.attr("width")+20 || parseInt(snowBalls[i].progress) > parseInt(canvasElement.attr("height"))+50 || snowBalls[i].opacity < 0)
                 {
                     snowBalls.splice(i,1);
-                }
-                else if(xCalc > canvasElement.attr("width")+20)
-                {
-                    snowBalls.splice(i,1);
+                    i--;
                 }
                 else {
-                    snowBalls[i].progress = snowBalls[i].progress + snowBalls[i].speed;
+                    snowBalls[i].progress = snowBalls[i].progress + snowBalls[i].speed*animationprocess;
                 }
             }
 
             if (opacity != 0.05 && opacity > 0.05 && snowGeneration){
                 opacity = opacity-5;
-                console.log(opacity);
             }
         };
 
         var drawDebug = function(){
             canvasElement.drawText({
-                y: 30,
-                x: 20,
-                fontSize: 20,
+                y: 30*2,
+                x: 20*2,
+                fontSize: 20*2,
                 text: "Mouse: "+pathLength,
                 fillStyle: "#fff",
                 respectAlign: true,
                 align: "left"
             });
             canvasElement.drawText({
-                y: 60,
-                x: 20,
-                fontSize: 20,
-                text: "Schneefloken: "+newSnowFlakes,
+                y: 60*2,
+                x: 20*2,
+                fontSize: 20*2,
+                text: "Schneefloken: "+snowBalls.length,
                 fillStyle: "#fff",
                 respectAlign: true,
                 align: "left"
             });
             canvasElement.drawText({
-                y: 90,
-                x: 20,
-                fontSize: 20,
+                y: 90*2,
+                x: 20*2,
+                fontSize: 20*2,
                 text: "Rotate: "+rotate,
                 fillStyle: "#fff",
                 respectAlign: true,
@@ -231,18 +289,13 @@
 
         var rotate = 0;
         var opacity = 100;
-        var family = [
-            'Andrea',
-            'Robin',
-            'Oliver',
-            'Silvia',
-            'Rolf',
-            'Nicolas'
-        ]
+
+
         var color = "#000000";
         var text = "shake\nthe\ncloud";
-        var fontSize = 80;
+        var fontSize = 80*2;
         var fontColor = "#e7d283";
+        var txtrotate;
         var drawWorld = function(){
 
             switch (true) {
@@ -251,31 +304,31 @@
                     break;
                 case totalProcess < 3500:
                     snowGeneration = true;
-                    fontSize = 90;
+                    fontSize = 80*2;
                     color = "#f56ced";
                     fontColor = "#761370";
                     text = "we\nwish\nyou";
                     break;
                 case totalProcess < 5500:
-                    fontSize = 70;
+                    fontSize = 70*2;
                     fontColor = "#395b05";
                     color = "#89d223";
                     text = "a merry\nchrist-\nmas";
                     break;
                 case totalProcess < 6500:
-                    fontSize = 100;
+                    fontSize = 100*2;
                     color = "#181b20";
                     fontColor = "#e5cd83";
                     text = "and";
                     break;
                 case totalProcess < 8500:
-                    fontSize = 70;
+                    fontSize = 60*2;
                     fontColor = "#05586a";
                     color = "#31caea";
                     text = "a happy\nnew year";
                     break;
                 case totalProcess < 10500:
-                    fontSize = 80;
+                    fontSize = 70*2;
                     fontColor = "#e8d287";
                     color = "#171a1f";
                     text = "the\nglauser\n family";
@@ -285,15 +338,14 @@
                     break;
             }
 
-
             canvasElement.drawEllipse({
                 fillStyle: color,
-                x: document.body.clientWidth/2, y: 600,
-                width: 300, height: 300
+                x: document.body.clientWidth, y: 600*2,
+                width: 300*2, height: 300*2
             });
 
             canvasElement.drawText({
-                x: document.body.clientWidth/2, y: 600,
+                x: document.body.clientWidth, y: 600*2,
                 fontSize: fontSize,
                 text: text,
                 fillStyle: fontColor,
@@ -302,43 +354,48 @@
                 opacity: 1
             });
 
+
+
             var l = family.length;
+
             for (var i = 0; i < l; i++){
+                txtrotate = rotate+i*(360/l);
+
                 canvasElement.drawText({
-                    x: document.body.clientWidth/2, y: 600,
-                    fontSize: 80,
-                    text: family[i].substr(0,1)+"\n\n\n\n\n\n",
+                    x: document.body.clientWidth + 352 * Math.cos(txtrotate*Math.PI/180), y: 600*2 + 352 * Math.sin(txtrotate*Math.PI/180),
+                    fontSize: 80*2,
+                    text: family[i].substr(0,1),
                     fillStyle: color,
                     fontStyle: "bold",
                     fontFamily: "Arial",
                     lineHeight: "0.73",
-                    rotate: rotate+i*(360/l)
+                    rotate: txtrotate+90
                 });
 
-                $("canvas").drawImage({
+                canvasElement.drawImage({
                     source: "img/"+family[i]+".png",
-                    x: document.body.clientWidth/2, y: 600,
-                    rotate: rotate+i*(360/l)
+                    x: document.body.clientWidth + 500 * Math.cos(txtrotate*Math.PI/180), y: 600*2 + 500 * Math.sin(txtrotate*Math.PI/180),
+                    rotate: txtrotate+90,
+                    height: 150,
+                    width: 150
                 });
             }
 
             canvasElement.drawBezier({
                 strokeStyle: "#e5ce7e",
-                strokeWidth: 6,
+                strokeWidth: 6*2,
                 rounded: true,
                 startArrow: true,
                 endArrow: false,
-                arrowRadius: 15,
+                arrowRadius: 15*2,
                 arrowAngle: 90,
-                x1: document.body.clientWidth/2-200, y1: 190,
-                cx1:  document.body.clientWidth/2-200, cy1: 200,
-                cx2: document.body.clientWidth/2-200, cy2: 300,
-                x2: document.body.clientWidth/2-100, y2: 500,
+                x1: (document.body.clientWidth/2-200)*2, y1: 190*2,
+                cx1:  (document.body.clientWidth/2-200)*2, cy1: 200*2,
+                cx2: (document.body.clientWidth/2-200)*2, cy2: 300*2,
+                x2: (document.body.clientWidth/2-100)*2, y2: 500*2,
                 opacity: opacity/100
             });
-
-            rotate = (rotate+1)%360;
-
+            rotate = (rotate+0.3*animationprocess)%360;
         };
 
         var addSnowFlake = function (progress, angle, start, size, speed) {
@@ -347,7 +404,8 @@
                 angle: angle,
                 start: start,
                 size: size,
-                speed: speed
+                speed: speed,
+                opacity: Math.min(1,Math.max(Math.random(), 0.4)+0.2)
             });
         };
 
@@ -371,19 +429,28 @@
             else {
                 snowGeneration = true;
                 clickSound.play();
-
             }
 
-            var progressRand,angleRand,startRand,sizeRand,speedRand;
+            var progressRand,angleRand,startRand,sizeRand,speedRand,positiveAngleRand;
+
+
+
+//            console.log('Total Snowflakes: '+snowBalls.length);
+//            console.log('Total Snowflakes: '+(snowBalls.length+newSnowFlakes) % settings.maxSnowFlakes);
+            if (snowBalls.length+newSnowFlakes > settings.maxSnowFlakes){
+                newSnowFlakes = 0;
+            }
+//            console.log('Snowflakes: '+newSnowFlakes);
             for (var i = 0; i < newSnowFlakes; i++){
-               var progressRand = 100-Math.random()*20;
-                var  angleRand = Math.random()*1.5-0.75;
-                var positiveAngleRand = angleRand < 0 ? 1 : -1;
+
+                progressRand = 200-Math.random()*20;
+                angleRand = Math.random()*1.5-0.75;
+                positiveAngleRand = angleRand < 0 ? 1 : -1;
                 angleRand = positiveAngleRand*angleRand*angleRand;
 
-                var  startRand = (Math.random()*(jQuery('#cloud').width()-150)) +  jQuery('#cloud').offset().left+60;
-                var  sizeRand = Math.random()*10+10;
-                var  speedRand = Math.random()+2;
+                startRand = (Math.random()*(jQuery('#cloud').width()-150)*2) +  ((jQuery('#cloud').offset().left)+60)*2;
+                sizeRand = (Math.random()*10+20);
+                speedRand = Math.random()+2;
 
                 addSnowFlake(progressRand, angleRand, startRand, sizeRand, speedRand);
             }
@@ -395,11 +462,7 @@
             pathLength = pathLength < 0 ? 0 : pathLength;
             pathLength = pathLength > 25000 ? 25000 : pathLength;
             totalProcess += 10;
-        }, 10);
-
-
-
-
+        }, 8);
 
 
     };
